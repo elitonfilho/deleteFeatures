@@ -1,6 +1,7 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
     <qresource prefix="/plugins/deleteFeatures">
-        <file>filter.png</file>
+        <file>filter_intersection.png</file>
+        <file>filter_clipper.png</file>
     </qresource>
 </RCC>

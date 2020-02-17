@@ -25,23 +25,43 @@ class DeleteFeatures:
         self.coordinates = []
         self.toolbar = self.iface.addToolBar(
             "Delete Features by intersection")
-        # Icon by FreePik
-        icon_path = ':/plugins/deleteFeatures/filter.png'
-        self.action = QAction(
-            QIcon(icon_path), u"Remove feições baseado na seleção", self.iface.mainWindow())
-        self.action.setObjectName("Delete Features based on selection")
-        self.action.setStatusTip(None)
-        self.action.setWhatsThis(None)
-        self.action.setCheckable(True)
-        self.toolbar.addAction(self.action)
+        # Icons by FreePik and Kiranshastry
+        icon_path = ':/plugins/deleteFeatures/filter_clipper.png'
+        self.action_clipper = QAction(
+            QIcon(icon_path), u"Remove feições realizando um clip", self.iface.mainWindow())
+        self.action_clipper.setObjectName("Delete Features based on clip")
+        self.action_clipper.setStatusTip(None)
+        self.action_clipper.setWhatsThis(None)
+        self.action_clipper.setCheckable(True)
+        self.toolbar.addAction(self.action_clipper)
+
+        icon_path = ':/plugins/deleteFeatures/filter_intersection.png'
+        self.action_intersection = QAction(
+            QIcon(icon_path), u"Remove feições realizando uma interseção", self.iface.mainWindow())
+        self.action_intersection.setObjectName("Delete Features based on intersection")
+        self.action_intersection.setStatusTip(None)
+        self.action_intersection.setWhatsThis(None)
+        self.action_intersection.setCheckable(True)
+        self.toolbar.addAction(self.action_intersection)
 
         self.previousMapTool = self.iface.mapCanvas().mapTool()
         self.myMapTool = QgsMapToolEmitPoint(self.iface.mapCanvas())
         self.isEditing = 0
 
     def initSignals(self):
-        self.action.toggled.connect(self.RubberBand)
+        self.action_clipper.toggled.connect(self.RubberBand)
+        self.action_clipper.toggled.connect(self.changeToClipper)
+        self.action_intersection.toggled.connect(self.RubberBand)
+        self.action_intersection.toggled.connect(self.changeToIntersection)
         self.myMapTool.canvasClicked.connect(self.mouseClick)
+
+    def changeToClipper(self):
+        self.currentTool = 'clipper'
+        print(self.currentTool)
+
+    def changeToIntersection(self):
+        self.currentTool = 'intersection'
+        print(self.currentTool)
 
     def disconnect(self):
         self.iface.mapCanvas().unsetMapTool(self.myMapTool)
@@ -56,8 +76,8 @@ class DeleteFeatures:
             pass
 
     def unChecked(self):
-        self.action.setCheckable(False)
-        self.action.setCheckable(True)
+        self.action_clipper.setCheckable(False)
+        self.action_clipper.setCheckable(True)
 
     def unload(self):
         self.disconnect()
