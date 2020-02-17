@@ -7,6 +7,8 @@ from qgis.PyQt.QtGui import *
 from qgis.PyQt.QtWidgets import *
 from qgis.gui import *
 from qgis.core import *
+from deleteFeatures import resources
+
 
 
 class DeleteFeatures:
@@ -23,11 +25,10 @@ class DeleteFeatures:
         self.coordinates = []
         self.toolbar = self.iface.addToolBar(
             "Delete Features by intersection")
-        mainWindow = self.iface.mainWindow()
         # Icon by FreePik
         icon_path = ':/plugins/deleteFeatures/filter.png'
         self.action = QAction(
-            QIcon(icon_path), u"Remove feições baseado na seleção", mainWindow)
+            QIcon(icon_path), u"Remove feições baseado na seleção", self.iface.mainWindow())
         self.action.setObjectName("Delete Features based on selection")
         self.action.setStatusTip(None)
         self.action.setWhatsThis(None)
@@ -99,7 +100,7 @@ class DeleteFeatures:
                     new_geom.append(diff)
                     feat.setGeometry(diff)
                     layer.changeGeometry(feat.id(), diff)
-                layer.commitChanges()
+                # layer.updateExtents()
                     
             print(layers)
             # create feature and set geometry.
