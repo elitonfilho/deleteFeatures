@@ -33,7 +33,7 @@ class DeleteFeatures:
         self.action_clipper.setStatusTip(None)
         self.action_clipper.setWhatsThis(None)
         self.action_clipper.setCheckable(True)
-        self.toolbar.addAction(self.action_clipper)
+        # self.toolbar.addAction(self.action_clipper)
 
         icon_path = ':/plugins/deleteFeatures/filter_intersection.png'
         self.action_intersection = QAction(
@@ -42,6 +42,14 @@ class DeleteFeatures:
         self.action_intersection.setStatusTip(None)
         self.action_intersection.setWhatsThis(None)
         self.action_intersection.setCheckable(True)
+        # self.toolbar.addAction(self.action_intersection)
+
+        action_group = QActionGroup(self.iface.mainWindow())
+        action_group.addAction(self.action_clipper)
+        action_group.addAction(self.action_intersection)
+        action_group.setExclusive(True)
+
+        self.toolbar.addAction(self.action_clipper)
         self.toolbar.addAction(self.action_intersection)
 
         self.previousMapTool = self.iface.mapCanvas().mapTool()
