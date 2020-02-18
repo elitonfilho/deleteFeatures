@@ -110,6 +110,13 @@ class DeleteFeatures:
         else:
             self.disconnect()
 
+    def checkValidity(self, geomRubber):
+        if not geomRubber.isGeosValid():
+            self.myRubberBand.reset(QgsWkbTypes.PolygonGeometry)
+            self.disconnect()
+            self.unChecked()
+            raise Exception('A geometria criada não é válida')
+
     def mouseClick(self, currentPos, clickedButton):
         if clickedButton == Qt.LeftButton:  # and myRubberBand.numberOfVertices() == 0:
             self.myRubberBand.addPoint(QgsPointXY(currentPos))
@@ -120,6 +127,7 @@ class DeleteFeatures:
             self.isEditing = 0
             
             geomRubber = self.myRubberBand.asGeometry()
+            self.checkValidity(geomRubber)
 
             layers = QgsProject.instance().mapLayers()
             for layer_id, layer in layers.items():
