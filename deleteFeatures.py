@@ -116,41 +116,18 @@ class DeleteFeatures:
                 features = layer.getFeatures()
                 for feat in features:
                     geom = feat.geometry()
-                    diff = geom.difference(geomRubber)
-                    new_geom.append(diff)
-                    feat.setGeometry(diff)
-                    layer.changeGeometry(feat.id(), diff)
+                    if self.currentTool == 'clipper':
+                        diff = geom.difference(geomRubber)
+                        new_geom.append(diff)
+                        feat.setGeometry(diff)
+                        layer.changeGeometry(feat.id(), diff)
+                    elif self.currentTool == 'intersection':
+                        if geom.intersects(geomRubber):
+                            layer.deleteFeature(feat.id())
+
                 # layer.updateExtents()
                     
             print(layers)
-            # create feature and set geometry.
-
-            # poly = QgsFeature()
-            # geomP = self.myRubberBand.asGeometry()
-            # poly.setGeometry(geomP)
-            # g = geomP.asWkt()  # Get WKT coordenates.
-
-            # canvas = self.iface.mapCanvas()
-
-            # c = canvas.mapSettings().destinationCrs().authid()  # Get EPSG.
-            # rep = c.replace("EPSG:", "")
-
-            # vlyr = QgsVectorLayer("?query=SELECT geom_from_wkt('%s') as geometry&geometry=geometry:3:%s" % (
-            #     g, rep), "Polygon_Reference", "virtual")
-
-            # QgsProject.instance().addMapLayer(vlyr)
-
-            # self.myRubberBand.reset(QgsWkbTypes.PolygonGeometry)
-
-            # string = U"st_intersects(geom,st_geomfromewkt('SRID="+rep+";"+g+"'))"
-
-            # layers = self.iface.mapCanvas().layers()
-
-            # for layer in layers:
-            #     try:
-            #         layer.setSubsetString(string)
-            #     except Exception:
-            #         pass
 
             self.myRubberBand.reset(QgsWkbTypes.PolygonGeometry)
             self.disconnect()
