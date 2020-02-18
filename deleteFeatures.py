@@ -65,11 +65,9 @@ class DeleteFeatures:
 
     def changeToClipper(self):
         self.currentTool = 'clipper'
-        print(self.currentTool)
 
     def changeToIntersection(self):
         self.currentTool = 'intersection'
-        print(self.currentTool)
 
     def disconnect(self):
         self.iface.mapCanvas().unsetMapTool(self.myMapTool)
@@ -112,10 +110,10 @@ class DeleteFeatures:
 
     def checkValidity(self, geomRubber):
         if not geomRubber.isGeosValid():
+            self.iface.messageBar().pushMessage("Erro", "Geometria inválida", level=Qgis.Critical)
             self.myRubberBand.reset(QgsWkbTypes.PolygonGeometry)
             self.disconnect()
             self.unChecked()
-            raise Exception('A geometria criada não é válida')
 
     def mouseClick(self, currentPos, clickedButton):
         if clickedButton == Qt.LeftButton:  # and myRubberBand.numberOfVertices() == 0:
