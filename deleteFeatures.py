@@ -44,7 +44,7 @@ class DeleteFeatures:
         self.action_intersection.setCheckable(True)
         # self.toolbar.addAction(self.action_intersection)
 
-        action_group = QActionGroup(self.iface.mainWindow())
+        action_group = QActionGroup(self.toolbar)
         action_group.addAction(self.action_clipper)
         action_group.addAction(self.action_intersection)
         action_group.setExclusive(True)
@@ -84,8 +84,12 @@ class DeleteFeatures:
             pass
 
     def unChecked(self):
-        self.action_clipper.setCheckable(False)
-        self.action_clipper.setCheckable(True)
+        if self.currentTool == 'clipper':
+            self.action_clipper.setCheckable(False)
+            self.action_clipper.setCheckable(True)
+        elif self.currentTool == 'intersection':
+            self.action_intersection.setCheckable(False)
+            self.action_intersection.setCheckable(True)
 
     def unload(self):
         self.disconnect()
