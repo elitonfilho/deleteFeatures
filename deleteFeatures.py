@@ -10,7 +10,6 @@ from qgis.core import *
 from deleteFeatures import resources
 
 
-
 class DeleteFeatures:
 
     def __init__(self, iface):
@@ -38,7 +37,8 @@ class DeleteFeatures:
         icon_path = ':/plugins/deleteFeatures/filter_intersection.png'
         self.action_intersection = QAction(
             QIcon(icon_path), u"Remove feições realizando uma interseção", self.iface.mainWindow())
-        self.action_intersection.setObjectName("Delete Features based on intersection")
+        self.action_intersection.setObjectName(
+            "Delete Features based on intersection")
         self.action_intersection.setStatusTip(None)
         self.action_intersection.setWhatsThis(None)
         self.action_intersection.setCheckable(True)
@@ -110,10 +110,13 @@ class DeleteFeatures:
 
     def checkValidity(self, geomRubber):
         if not geomRubber.isGeosValid():
-            self.iface.messageBar().pushMessage("Erro", "Geometria inválida", level=Qgis.Critical)
+            self.iface.messageBar().pushMessage(
+                "Erro", "Geometria inválida", level=Qgis.Critical)
             self.myRubberBand.reset(QgsWkbTypes.PolygonGeometry)
             self.disconnect()
             self.unChecked()
+            return False
+        return True
 
     def mouseClick(self, currentPos, clickedButton):
         if clickedButton == Qt.LeftButton:  # and myRubberBand.numberOfVertices() == 0:
@@ -123,29 +126,28 @@ class DeleteFeatures:
 
         elif clickedButton == Qt.RightButton and self.myRubberBand.numberOfVertices() > 2:
             self.isEditing = 0
-            
+            # TODO: get checked layers drom QgsLayerTreeNode
+            # root = QgsProject.instance().layerTreeRoot()
+            # layers = [tree_layer.layer() for tree_layer in QgsProject.instance().layerTreeRoot().findLayers()]
             geomRubber = self.myRubberBand.asGeometry()
-            self.checkValidity(geomRubber)
+            if self.checkValidity(geomRubber):
+                layers = QgsProject.instance().mapLayers()
+                for layer_id, layer in layers.items():
+                    new_geom = []
+                    layer.startEditing()
+                    features = layer.getFeatures()
+                    for feat in features:
+                        geom = feat.geometry()
+                        if self.currentTool == 'clipper':
+                            diff = geom.difference(geomRubber)
+                            new_geom.append(diff)
+                            feat.setGeometry(diff)
+                            layer.changeGeometry(feat.id(), diff)
+                        elif self.currentTool == 'intersection':
+                            if geom.intersects(geomRubber):
+                                layer.deleteFeature(feat.id())
 
-            layers = QgsProject.instance().mapLayers()
-            for layer_id, layer in layers.items():
-                new_geom = []
-                layer.startEditing()
-                features = layer.getFeatures()
-                for feat in features:
-                    geom = feat.geometry()
-                    if self.currentTool == 'clipper':
-                        diff = geom.difference(geomRubber)
-                        new_geom.append(diff)
-                        feat.setGeometry(diff)
-                        layer.changeGeometry(feat.id(), diff)
-                    elif self.currentTool == 'intersection':
-                        if geom.intersects(geomRubber):
-                            layer.deleteFeature(feat.id())
-
-                # layer.updateExtents()
-                    
-            print(layers)
+            self.iface.mapCanvas().refresh()
 
             self.myRubberBand.reset(QgsWkbTypes.PolygonGeometry)
             self.disconnect()
