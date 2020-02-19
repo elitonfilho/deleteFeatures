@@ -32,7 +32,6 @@ class DeleteFeatures:
         self.action_clipper.setStatusTip(None)
         self.action_clipper.setWhatsThis(None)
         self.action_clipper.setCheckable(True)
-        # self.toolbar.addAction(self.action_clipper)
 
         icon_path = ':/plugins/deleteFeatures/filter_intersection.png'
         self.action_intersection = QAction(
@@ -42,7 +41,6 @@ class DeleteFeatures:
         self.action_intersection.setStatusTip(None)
         self.action_intersection.setWhatsThis(None)
         self.action_intersection.setCheckable(True)
-        # self.toolbar.addAction(self.action_intersection)
 
         action_group = QActionGroup(self.toolbar)
         action_group.addAction(self.action_clipper)
@@ -126,13 +124,11 @@ class DeleteFeatures:
 
         elif clickedButton == Qt.RightButton and self.myRubberBand.numberOfVertices() > 2:
             self.isEditing = 0
-            # TODO: get checked layers drom QgsLayerTreeNode
-            # root = QgsProject.instance().layerTreeRoot()
-            # layers = [tree_layer.layer() for tree_layer in QgsProject.instance().layerTreeRoot().findLayers()]
             geomRubber = self.myRubberBand.asGeometry()
+            node_layers = QgsProject.instance().layerTreeRoot().findLayers()
             if self.checkValidity(geomRubber):
-                layers = QgsProject.instance().mapLayers()
-                for layer_id, layer in layers.items():
+                layers = [x.layer() for x in node_layers if x.isVisible()]
+                for layer in layers:
                     new_geom = []
                     layer.startEditing()
                     features = layer.getFeatures()
@@ -141,7 +137,6 @@ class DeleteFeatures:
                         if self.currentTool == 'clipper':
                             diff = geom.difference(geomRubber)
                             new_geom.append(diff)
-                            feat.setGeometry(diff)
                             layer.changeGeometry(feat.id(), diff)
                         elif self.currentTool == 'intersection':
                             if geom.intersects(geomRubber):
